@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "761747691754",
+    "firebase_url": "https://foodfinder-3ffd6-default-rtdb.firebaseio.com",
+    "project_id": "foodfinder-3ffd6",
+    "storage_bucket": "foodfinder-3ffd6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:761747691754:android:a130a85851047dff265f93",
+        "android_client_info": {
+          "package_name": "com.foodfinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "761747691754-8r5uolr023jo73hufdudmroimf0lauiu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.foodfinder",
+            "certificate_hash": "417029f2587ceea0be9fb68a0351e046c68a431c"
+          }
+        },
+        {
+          "client_id": "761747691754-u00rsm4ct0em06k7dff48s3oan3re053.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBIVeN4CfVvMfoINhZ0Hm5WAH1tqyJ3Ok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "761747691754-u00rsm4ct0em06k7dff48s3oan3re053.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

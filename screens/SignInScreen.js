@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { 
     View, 
     Text, 
@@ -13,6 +13,7 @@ import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
+import auth from '@react-native-firebase/auth';
 
 import { useTheme } from 'react-native-paper';
 
@@ -21,6 +22,13 @@ import { AuthContext } from '../components/context';
 import Users from '../model/users';
 
 const SignInScreen = ({navigation}) => {
+    const { signIn } = React.useContext(AuthContext);
+
+    const [phoneNumber,setPhoneNumber] = useState('');
+    const [confirm, setConfirm] = useState(null);
+    const [token,setToken] = useState('');
+
+    const [code, setCode] = useState('');
 
     const [data, setData] = React.useState({
         username: '',
@@ -33,7 +41,7 @@ const SignInScreen = ({navigation}) => {
 
     const { colors } = useTheme();
 
-    const { signIn } = React.useContext(AuthContext);
+    // const { signIn } = React.useContext(AuthContext);
 
     const textInputChange = (val) => {
         if( val.trim().length >= 4 ) {
@@ -90,27 +98,22 @@ const SignInScreen = ({navigation}) => {
         }
     }
 
-    const loginHandle = (userName, password) => {
+    async function signInWithPhoneNumber(phoneNumber) {
+        const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+     setToken(confirmation._verificationId);
+        setConfirm(confirmation);
+      }
 
-        const foundUser = Users.filter( item => {
-            return userName == item.username && password == item.password;
-        } );
-
-        if ( data.username.length == 0 || data.password.length == 0 ) {
-            Alert.alert('Wrong Input!', 'Username or password field cannot be empty.', [
-                {text: 'Okay'}
-            ]);
-            return;
+      async function confirmCode() {
+      
+        try {
+          await confirm.confirm(code).then(signIn(token))
+        } catch (error) {
+          console.log('Invalid code.');
         }
+      }
 
-        if ( foundUser.length == 0 ) {
-            Alert.alert('Invalid User!', 'Username or password is incorrect.', [
-                {text: 'Okay'}
-            ]);
-            return;
-        }
-        signIn(foundUser);
-    }
+
 
     return (
       <View style={styles.container}>
@@ -124,23 +127,25 @@ const SignInScreen = ({navigation}) => {
                 backgroundColor: colors.background
             }]}
         >
-            <Text style={[styles.text_footer, {
+            {!confirm  ? 
+            <View>
+              <Text style={[styles.text_footer, {
                 color: colors.text
-            }]}>Username</Text>
+            }]}>Phone Number</Text>
             <View style={styles.action}>
                 <FontAwesome 
-                    name="user-o"
+                    name="phone"
                     color={colors.text}
                     size={20}
                 />
                 <TextInput 
-                    placeholder="Your Username"
+                    placeholder="Enter Phone Number"
                     placeholderTextColor="#666666"
                     style={[styles.textInput, {
                         color: colors.text
                     }]}
                     autoCapitalize="none"
-                    onChangeText={(val) => textInputChange(val)}
+                    onChangeText={(val) => setPhoneNumber(val)}
                     onEndEditing={(e)=>handleValidUser(e.nativeEvent.text)}
                 />
                 {data.check_textInputChange ? 
@@ -155,6 +160,41 @@ const SignInScreen = ({navigation}) => {
                 </Animatable.View>
                 : null}
             </View>
+            </View>
+            :  <View>
+            <Text style={[styles.text_footer, {
+              color: colors.text
+          }]}>Confrim Code</Text>
+          <View style={styles.action}>
+              <FontAwesome 
+                  name="phone"
+                  color={colors.text}
+                  size={20}
+              />
+              <TextInput 
+                  placeholder="Enter Six digit code"
+                  placeholderTextColor="#666666"
+                  style={[styles.textInput, {
+                      color: colors.text
+                  }]}
+                  autoCapitalize="none"
+                  onChangeText={(val) => setCode(val)}
+                  onEndEditing={(e)=>handleValidUser(e.nativeEvent.text)}
+              />
+              {data.check_textInputChange ? 
+              <Animatable.View
+                  animation="bounceIn"
+              >
+                  <Feather 
+                      name="check-circle"
+                      color="green"
+                      size={20}
+                  />
+              </Animatable.View>
+              : null}
+          </View>
+          </View>}
+          
             { data.isValidUser ? null : 
             <Animatable.View animation="fadeInLeft" duration={500}>
             <Text style={styles.errorMsg}>Username must be 4 characters long.</Text>
@@ -162,44 +202,7 @@ const SignInScreen = ({navigation}) => {
             }
             
 
-            <Text style={[styles.text_footer, {
-                color: colors.text,
-                marginTop: 35
-            }]}>Password</Text>
-            <View style={styles.action}>
-                <Feather 
-                    name="lock"
-                    color={colors.text}
-                    size={20}
-                />
-                <TextInput 
-                    placeholder="Your Password"
-                    placeholderTextColor="#666666"
-                    secureTextEntry={data.secureTextEntry ? true : false}
-                    style={[styles.textInput, {
-                        color: colors.text
-                    }]}
-                    autoCapitalize="none"
-                    onChangeText={(val) => handlePasswordChange(val)}
-                />
-                <TouchableOpacity
-                    onPress={updateSecureTextEntry}
-                >
-                    {data.secureTextEntry ? 
-                    <Feather 
-                        name="eye-off"
-                        color="grey"
-                        size={20}
-                    />
-                    :
-                    <Feather 
-                        name="eye"
-                        color="grey"
-                        size={20}
-                    />
-                    }
-                </TouchableOpacity>
-            </View>
+           
             { data.isValidPassword ? null : 
             <Animatable.View animation="fadeInLeft" duration={500}>
             <Text style={styles.errorMsg}>Password must be 8 characters long.</Text>
@@ -207,13 +210,10 @@ const SignInScreen = ({navigation}) => {
             }
             
 
-            <TouchableOpacity>
-                <Text style={{color: '#FF6347', marginTop:15}}>Forgot password?</Text>
-            </TouchableOpacity>
-            <View style={styles.button}>
+      {!confirm ?  <View style={styles.button}>
                 <TouchableOpacity
                     style={styles.signIn}
-                    onPress={() => {loginHandle( data.username, data.password )}}
+                    onPress={() => {signInWithPhoneNumber(phoneNumber)}}
                 >
                 <LinearGradient
                     colors={['#FFA07A', '#FF6347']}
@@ -221,23 +221,30 @@ const SignInScreen = ({navigation}) => {
                 >
                     <Text style={[styles.textSign, {
                         color:'#fff'
-                    }]}>Sign In</Text>
+                    }]}>Get Code</Text>
                 </LinearGradient>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('SignUpScreen')}
-                    style={[styles.signIn, {
-                        borderColor: '#FF6347',
-                        borderWidth: 1,
-                        marginTop: 15
-                    }]}
-                >
-                    <Text style={[styles.textSign, {
-                        color: '#FF6347'
-                    }]}>Sign Up</Text>
-                </TouchableOpacity>
-            </View>
+          
+            </View>:
+             <View style={styles.button}>
+             <TouchableOpacity
+                 style={styles.signIn}
+                 onPress={() => {confirmCode()}}
+             >
+             <LinearGradient
+                 colors={['#FFA07A', '#FF6347']}
+                 style={styles.signIn}
+             >
+                 <Text style={[styles.textSign, {
+                     color:'#fff'
+                 }]}>Verify</Text>
+             </LinearGradient>
+             </TouchableOpacity>
+
+       
+         </View> }
+           
         </Animatable.View>
       </View>
     );

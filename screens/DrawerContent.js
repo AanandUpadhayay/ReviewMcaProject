@@ -19,6 +19,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import{ AuthContext } from '../components/context';
+import EditProfileScreen from './test/EditProfileScreen';
 
 export function DrawerContent(props) {
 
@@ -101,7 +102,8 @@ export function DrawerContent(props) {
                             label="Settings"
                             onPress={() => {props.navigation.navigate('SettingsScreen')}}
                         />
-                        <DrawerItem 
+                        <DrawerItem
+                         
                             icon={({color, size}) => (
                                 <Icon 
                                 name="account-check-outline" 
@@ -111,6 +113,17 @@ export function DrawerContent(props) {
                             )}
                             label="Support"
                             onPress={() => {props.navigation.navigate('SupportScreen')}}
+                        />
+                         <DrawerItem 
+                            icon={({color, size}) => (
+                                <Icon 
+                                name="account-check-outline" 
+                                color={color}
+                                size={size}
+                                />
+                            )}
+                            label="Upload Image"
+                            onPress={() => {props.navigation.navigate('EditProfileScreen')}}
                         />
                     </Drawer.Section>
                     <Drawer.Section title="Preferences">

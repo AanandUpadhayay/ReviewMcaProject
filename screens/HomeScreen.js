@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
+import database from '@react-native-firebase/database';
 
 import Swiper from 'react-native-swiper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -19,6 +20,14 @@ import StarRating from '../components/StarRating';
 
 const HomeScreen = ({navigation}) => {
   const theme = useTheme();
+
+  // database()
+  // .ref('/users/123')
+  // .set({
+  //   name: 'Ada Lovelace',
+  //   age: 31,
+  // })
+  // .then(() => console.log('Data set.'));
 
   return (
     <ScrollView style={styles.container}>

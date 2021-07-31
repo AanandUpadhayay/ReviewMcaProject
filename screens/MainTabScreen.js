@@ -60,7 +60,7 @@ const MainTabScreen = () => (
         ),
       }}
     />
-    {/* <Tab.Screen
+    <Tab.Screen
       name="Explore"
       component={ExploreScreen}
       options={{
@@ -70,7 +70,7 @@ const MainTabScreen = () => (
           <Icon name="ios-aperture" color={color} size={26} />
         ),
       }}
-    /> */}
+    />
   </Tab.Navigator>
 );
 

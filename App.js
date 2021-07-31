@@ -33,6 +33,7 @@ import { AuthContext } from './components/context';
 import RootStackScreen from './screens/RootStackScreen';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import EditProfileScreen from './screens/test/EditProfileScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -111,6 +112,7 @@ const App = () => {
       // setUserToken('fgkj');
       // setIsLoading(false);
       const userToken = String(foundUser[0].userToken);
+      
       const userName = foundUser[0].username;
       
       try {
@@ -172,6 +174,8 @@ const App = () => {
           <Drawer.Screen name="SupportScreen" component={SupportScreen} />
           <Drawer.Screen name="SettingsScreen" component={SettingsScreen} />
           <Drawer.Screen name="BookmarkScreen" component={BookmarkScreen} />
+          <Drawer.Screen name="EditProfileScreen" component={EditProfileScreen} />
+         
         </Drawer.Navigator>
       )
     :
