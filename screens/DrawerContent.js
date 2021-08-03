@@ -20,6 +20,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import{ AuthContext } from '../components/context';
 import EditProfileScreen from './test/EditProfileScreen';
+import ExploreScreen from './ExploreScreen';
 
 export function DrawerContent(props) {
 
@@ -123,7 +124,7 @@ export function DrawerContent(props) {
                                 />
                             )}
                             label="Upload Image"
-                            onPress={() => {props.navigation.navigate('EditProfileScreen')}}
+                            onPress={() => {props.navigation.navigate('ExploreScreen')}}
                         />
                     </Drawer.Section>
                     <Drawer.Section title="Preferences">

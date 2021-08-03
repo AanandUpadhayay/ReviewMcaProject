@@ -34,6 +34,7 @@ import RootStackScreen from './screens/RootStackScreen';
 
 import AsyncStorage from '@react-native-community/async-storage';
 import EditProfileScreen from './screens/test/EditProfileScreen';
+import ExploreScreen from './screens/ExploreScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -174,7 +175,8 @@ const App = () => {
           <Drawer.Screen name="SupportScreen" component={SupportScreen} />
           <Drawer.Screen name="SettingsScreen" component={SettingsScreen} />
           <Drawer.Screen name="BookmarkScreen" component={BookmarkScreen} />
-          <Drawer.Screen name="EditProfileScreen" component={EditProfileScreen} />
+          <Drawer.Screen name="ExploreScreen" component={ExploreScreen} />
+
          
         </Drawer.Navigator>
       )

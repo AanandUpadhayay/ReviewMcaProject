@@ -16,7 +16,8 @@ export default function UploadScreen() {
     const [image, setImage] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [transferred, setTransferred] = useState(0);
-    //...
+    console.log("image:"+image);
+   //...
 
     const selectImage = () => {
         const options = {

@@ -1,312 +1,5 @@
-// import React, {useState} from 'react';
-// import {
-//   View,
-//   Text,
-//   StyleSheet,
-//   Animated,
-//   TouchableHighlight,
-//   TouchableOpacity,
-//   StatusBar,
-// } from 'react-native';
-
-// import {SwipeListView} from 'react-native-swipe-list-view';
-// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
-// import Notifications from '../model/Notifications';
-
-// const NotificationScreen = ({navigation}) => {
-//   const [listData, setListData] = useState(
-//     Notifications.map((NotificationItem, index) => ({
-//       key: `${index}`,
-//       title: NotificationItem.title,
-//       details: NotificationItem.details,
-//     })),
-//   );
-
-//   const closeRow = (rowMap, rowKey) => {
-//     if (rowMap[rowKey]) {
-//       rowMap[rowKey].closeRow();
-//     }
-//   };
-
-//   const deleteRow = (rowMap, rowKey) => {
-//     closeRow(rowMap, rowKey);
-//     const newData = [...listData];
-//     const prevIndex = listData.findIndex(item => item.key === rowKey);
-//     newData.splice(prevIndex, 1);
-//     setListData(newData);
-//   };
-
-//   const onRowDidOpen = rowKey => {
-//     console.log('This row opened', rowKey);
-//   };
-
-//   const onLeftActionStatusChange = rowKey => {
-//     console.log('onLeftActionStatusChange', rowKey);
-//   };
-
-//   const onRightActionStatusChange = rowKey => {
-//     console.log('onRightActionStatusChange', rowKey);
-//   };
-
-//   const onRightAction = rowKey => {
-//     console.log('onRightAction', rowKey);
-//   };
-
-//   const onLeftAction = rowKey => {
-//     console.log('onLeftAction', rowKey);
-//   };
-
-//   const VisibleItem = props => {
-//     const {
-//       data,
-//       rowHeightAnimatedValue,
-//       removeRow,
-//       leftActionState,
-//       rightActionState,
-//     } = props;
-
-//     if (rightActionState) {
-//       Animated.timing(rowHeightAnimatedValue, {
-//         toValue: 0,
-//         duration: 200,
-//         useNativeDriver: false,
-//       }).start(() => {
-//         removeRow();
-//       });
-//     }
-
-//     return (
-//       <Animated.View
-//         style={[styles.rowFront, {height: rowHeightAnimatedValue}]}>
-//         <TouchableHighlight
-//           style={styles.rowFrontVisible}
-//           onPress={() => console.log('Element touched')}
-//           underlayColor={'#aaa'}>
-//           <View>
-//             <Text style={styles.title} numberOfLines={1}>
-//               {data.item.title}
-//             </Text>
-//             <Text style={styles.details} numberOfLines={1}>
-//               {data.item.details}
-//             </Text>
-//           </View>
-//         </TouchableHighlight>
-//       </Animated.View>
-//     );
-//   };
-
-//   const renderItem = (data, rowMap) => {
-//     const rowHeightAnimatedValue = new Animated.Value(60);
-
-//     return (
-//       <VisibleItem
-//         data={data}
-//         rowHeightAnimatedValue={rowHeightAnimatedValue}
-//         removeRow={() => deleteRow(rowMap, data.item.key)}
-//       />
-//     );
-//   };
-
-//   const HiddenItemWithActions = props => {
-//     const {
-//       swipeAnimatedValue,
-//       leftActionActivated,
-//       rightActionActivated,
-//       rowActionAnimatedValue,
-//       rowHeightAnimatedValue,
-//       onClose,
-//       onDelete,
-//     } = props;
-
-//     if (rightActionActivated) {
-//       Animated.spring(rowActionAnimatedValue, {
-//         toValue: 500,
-//         useNativeDriver: false
-//       }).start();
-//     } else {
-//       Animated.spring(rowActionAnimatedValue, {
-//         toValue: 75,
-//         useNativeDriver: false
-//       }).start();
-//     }
-
-//     return (
-//       <Animated.View style={[styles.rowBack, {height: rowHeightAnimatedValue}]}>
-//         <Text>Left</Text>
-//         {!leftActionActivated && (
-//           <TouchableOpacity
-//             style={[styles.backRightBtn, styles.backRightBtnLeft]}
-//             onPress={onClose}>
-//             <MaterialCommunityIcons
-//               name="close-circle-outline"
-//               size={25}
-//               style={styles.trash}
-//               color="#fff"
-//             />
-//           </TouchableOpacity>
-//         )}
-//         {!leftActionActivated && (
-//           <Animated.View
-//             style={[
-//               styles.backRightBtn,
-//               styles.backRightBtnRight,
-//               {
-//                 flex: 1,
-//                 width: rowActionAnimatedValue,
-//               },
-//             ]}>
-//             <TouchableOpacity
-//               style={[styles.backRightBtn, styles.backRightBtnRight]}
-//               onPress={onDelete}>
-//               <Animated.View
-//                 style={[
-//                   styles.trash,
-//                   {
-//                     transform: [
-//                       {
-//                         scale: swipeAnimatedValue.interpolate({
-//                           inputRange: [-90, -45],
-//                           outputRange: [1, 0],
-//                           extrapolate: 'clamp',
-//                         }),
-//                       },
-//                     ],
-//                   },
-//                 ]}>
-//                 <MaterialCommunityIcons
-//                   name="trash-can-outline"
-//                   size={25}
-//                   color="#fff"
-//                 />
-//               </Animated.View>
-//             </TouchableOpacity>
-//           </Animated.View>
-//         )}
-//       </Animated.View>
-//     );
-//   };
-
-//   const renderHiddenItem = (data, rowMap) => {
-//     const rowActionAnimatedValue = new Animated.Value(75);
-//     const rowHeightAnimatedValue = new Animated.Value(60);
-
-//     return (
-//       <HiddenItemWithActions
-//         data={data}
-//         rowMap={rowMap}
-//         rowActionAnimatedValue={rowActionAnimatedValue}
-//         rowHeightAnimatedValue={rowHeightAnimatedValue}
-//         onClose={() => closeRow(rowMap, data.item.key)}
-//         onDelete={() => deleteRow(rowMap, data.item.key)}
-//       />
-//     );
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <StatusBar barStyle="dark-content"/>
-//       {/* <StatusBar backgroundColor="#FF6347" barStyle="light-content"/> */}
-//       <SwipeListView
-//         data={listData}
-//         renderItem={renderItem}
-//         renderHiddenItem={renderHiddenItem}
-//         leftOpenValue={75}
-//         rightOpenValue={-150}
-//         disableRightSwipe
-//         onRowDidOpen={onRowDidOpen}
-//         leftActivationValue={100}
-//         rightActivationValue={-200}
-//         leftActionValue={0}
-//         rightActionValue={-500}
-//         onLeftAction={onLeftAction}
-//         onRightAction={onRightAction}
-//         onLeftActionStatusChange={onLeftActionStatusChange}
-//         onRightActionStatusChange={onRightActionStatusChange}
-//       />
-//     </View>
-//   );
-// };
-
-// export default NotificationScreen;
-
-// const styles = StyleSheet.create({
-//   container: {
-//     backgroundColor: '#f4f4f4',
-//     flex: 1,
-//   },
-//   backTextWhite: {
-//     color: '#FFF',
-//   },
-//   rowFront: {
-//     backgroundColor: '#FFF',
-//     borderRadius: 5,
-//     height: 60,
-//     margin: 5,
-//     marginBottom: 15,
-//     shadowColor: '#999',
-//     shadowOffset: {width: 0, height: 1},
-//     shadowOpacity: 0.8,
-//     shadowRadius: 2,
-//     elevation: 5,
-//   },
-//   rowFrontVisible: {
-//     backgroundColor: '#FFF',
-//     borderRadius: 5,
-//     height: 60,
-//     padding: 10,
-//     marginBottom: 15,
-//   },
-//   rowBack: {
-//     alignItems: 'center',
-//     backgroundColor: '#DDD',
-//     flex: 1,
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     paddingLeft: 15,
-//     margin: 5,
-//     marginBottom: 15,
-//     borderRadius: 5,
-//   },
-//   backRightBtn: {
-//     alignItems: 'flex-end',
-//     bottom: 0,
-//     justifyContent: 'center',
-//     position: 'absolute',
-//     top: 0,
-//     width: 75,
-//     paddingRight: 17,
-//   },
-//   backRightBtnLeft: {
-//     backgroundColor: '#1f65ff',
-//     right: 75,
-//   },
-//   backRightBtnRight: {
-//     backgroundColor: 'red',
-//     right: 0,
-//     borderTopRightRadius: 5,
-//     borderBottomRightRadius: 5,
-//   },
-//   trash: {
-//     height: 25,
-//     width: 25,
-//     marginRight: 7,
-//   },
-//   title: {
-//     fontSize: 14,
-//     fontWeight: 'bold',
-//     marginBottom: 5,
-//     color: '#666',
-//   },
-//   details: {
-//     fontSize: 12,
-//     color: '#999',
-//   },
-// });
-
-
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, TextInput, StyleSheet, ScrollView, Modal, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, Button, TextInput, StyleSheet, ScrollView, Modal, TouchableOpacity, FlatList, ImageBackground, } from 'react-native';
 import database from '@react-native-firebase/database';
 import DropDownPicker from 'react-native-dropdown-picker';
 import UploadScreen from './uploadImageScreen';
@@ -314,10 +7,15 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import auth from '@react-native-firebase/auth';
 import { utils } from '@react-native-firebase/app';
 import storage from '@react-native-firebase/storage';
+import BottomSheet from 'reanimated-bottom-sheet';
+import Animated from 'react-native-reanimated';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const SettingsScreen = () => {
   const reference = storage().ref('black-t-shirt-sm.png');
-
+  const [image, setImage] = useState();
+  const [uploadImageStatus,setUploadImageStatus] = useState(false);
+  console.log(image);
   const uid = auth().currentUser.uid;
   const [data1, setData1] = useState([]);
   const [businessData, setBusinessData] = useState([]);
@@ -341,9 +39,18 @@ const SettingsScreen = () => {
     { label: 'Cleaning Services', value: 'Cleaning Services' },
     { label: 'Pest Control', value: 'Pest Control' }
   ]);
-
+  let bs = React.createRef();
+  let fall = new Animated.Value(1);
 
   console.log(JSON.stringify(businessData));
+
+  database()
+  .ref('/users/')
+  .set({
+    name: "name",
+   
+  })
+  .then(() => console.log('Data set.'));
 
   const getId = () => {
 
@@ -353,19 +60,105 @@ const SettingsScreen = () => {
   }
 
 
+  const choosePhotoFromLibrary = () => {
+    ImagePicker.openPicker({
+
+      cropping: true,
+      compressImageQuality: 0.7
+    }).then(image => {
+      console.log(image);
+      setImage(image.path);
+    });
+    // bs.current.snapTo(1)
+  }
+
+  const uploadImage = async () => {
+    const url = await storage().ref(`users/images/${uid}/`).getDownloadURL();
+    console.log(url);
+    const reference = storage().ref(`users/images/${uid}/image/1`);
+    const task = reference.putFile(image);
+    task.on('state_changed', taskSnapshot => {
+      console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
+    });
+
+    task.then(() => {
+      console.log('Image uploaded to the bucket!');
+      setUploadImageStatus(true);
+    });
+  }
+
+  const renderInner = () => (
+    <View style={styles.panel}>
+      <View style={{ alignItems: 'center' }}>
+        <Text style={styles.panelTitle}>Upload Photo</Text>
+        <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
+      </View>
+      <TouchableOpacity style={styles.panelButton} onPress={choosePhotoFromLibrary}>
+        <Text style={styles.panelButtonTitle}>Choose From Library</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.panelButton} onPress={uploadImage}>
+        <Text style={styles.panelButtonTitle}>Upload Image</Text>
+        
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.panelButton}
+        onPress={() => bs.current.snapTo(1)}>
+        <Text style={styles.panelButtonTitle}>Cancel</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <View style={styles.panelHeader}>
+        <View style={styles.panelHandle} />
+      </View>
+    </View>
+  );
+
+
   useEffect(() => {
-   // setBusinessData([]);
+    // setBusinessData([]);
     database()
       .ref('/users/' + uid)
       .on('value', snapshot => {
-      //  setBusinessData(snapshot.val());
+        //  setBusinessData(snapshot.val());
         setData(snapshot.val());
         upDateData();
       });
 
   }, [])
 
-console.log(JSON.stringify(businessData));
+  // const choosePhotoFromLibrary = () => {
+  //   ImagePicker.openPicker({
+  //     width: 300,
+  //     height: 300,
+  //     cropping: true,
+  //     compressImageQuality: 0.7
+  //   }).then(image => {
+  //     console.log(image);
+  //     setImage(image.path);
+  //     bs.current.snapTo(1);
+  //   });
+  // }
+  // const uploadImage = async () => {
+  //   const url = await storage().ref(`users/images/${uid}/`).getDownloadURL();
+  //   console.log(url);
+  //   const reference = storage().ref(`users/images/${uid}/image/1`);
+  //   const task = reference.putFile(image);
+  //   task.on('state_changed', taskSnapshot => {
+  //     console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
+  //   });
+
+  //   task.then(() => {
+  //     console.log('Image uploaded to the bucket!');
+  //   });
+  // }
+
+
+  
+
+  console.log(JSON.stringify(businessData));
 
   function upDateData() {
 
@@ -391,10 +184,10 @@ console.log(JSON.stringify(businessData));
 
     }
 
-    const resultArr = businessData.filter((data,index)=>{
+    const resultArr = businessData.filter((data, index) => {
       return businessData.indexOf(data) === index;
     })
-    console.log(JSON.stringify("result:"+resultArr))
+    console.log(JSON.stringify("result:" + resultArr))
     setData1(resultArr);
 
 
@@ -412,14 +205,15 @@ console.log(JSON.stringify(businessData));
         category: value,
         mobileNumber: mobileNumber,
         descripton: descripton,
-        businessId: businessId
+        businessId: businessId,
+        image:image
       })
       .then(() => console.log('Data set.'));
   }
   console.log(JSON.stringify(data1));
 
   const renderItem = ({ item }) => {
-   
+
     return (
       <View>
         <Text>
@@ -432,6 +226,7 @@ console.log(JSON.stringify(businessData));
   return (
 
     <View style={styles.container}>
+
       <View style={{ height: '90%', }} >
         <View style={{}}>
           <FlatList
@@ -439,7 +234,7 @@ console.log(JSON.stringify(businessData));
             renderItem={renderItem}
             keyExtractor={item => item.businessId}
           />
-     
+
         </View>
       </View>
       <View style={{ height: '10%', justifyContent: 'flex-end', alignItems: 'flex-end' }} >
@@ -459,6 +254,7 @@ console.log(JSON.stringify(businessData));
         }}
       >
         <View style={{ flex: 1, margin: 10 }} >
+
           <View style={{ flexDirection: 'row' }} >
             <View style={{ marginTop: 10, marginBottom: 10, width: '80%' }} >
               <Text style={{ fontWeight: 'bold', fontSize: 20 }} >Add a Producct</Text>
@@ -472,45 +268,76 @@ console.log(JSON.stringify(businessData));
               </TouchableOpacity>
             </View>
           </View>
+          <ScrollView>
+            <Text style={styles.inputLabel} >Category</Text>
+            <DropDownPicker
+              open={open}
+              value={value}
+              items={category}
+              setOpen={setOpen}
+              setValue={setValue}
+              setItems={setCategory}
+            />
+            <Text style={styles.inputLabel} >Enter Name</Text>
+            <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setName(data) }} />
+            <Text style={styles.inputLabel} >Enter Business Name</Text>
+            <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setBusinessName(data) }} />
+            <Text style={styles.inputLabel} >Enter Business Name</Text>
+            <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setBusinessName(data) }} />
 
-          <Text style={styles.inputLabel} >Enter Name</Text>
-          <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setName(data) }} />
-          <Text style={styles.inputLabel} >Enter Business Name</Text>
-          <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setBusinessName(data) }} />
-          <Text style={styles.inputLabel} >Category</Text>
-          <DropDownPicker
-            open={open}
-            value={value}
-            items={category}
-            setOpen={setOpen}
-            setValue={setValue}
-            setItems={setCategory}
-          />
 
-          <Text style={styles.inputLabel} >Mobile Number</Text>
-          <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setMobileNumber(data) }} />
-          <Text style={styles.inputLabel} >Description</Text>
-          <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setDescription(data) }} />
-          <Button title="click"
-        onPress={async () => {
-          // path to existing file on filesystem
-          const pathToFile = `${utils.FilePath.PICTURES_DIRECTORY}/black-t-shirt-sm.png`;
-          // uploads file
-          await reference.putFile(pathToFile);
-        }}
-      />
-          <TouchableOpacity onPress={() => { addData() }} >
-            <View style={{ backgroundColor: '#367dd5', height: '30%', borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} >
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#fff' }} >Add</Text>
+            <Text style={styles.inputLabel} >Mobile Number</Text>
+            <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setMobileNumber(data) }} />
+            <Text style={styles.inputLabel} >Description</Text>
+            <View style={{ flexDirection: 'row' }} >
+             <View style={{width:'80%'}} >
+               <Text>Upload Image</Text>
+               {uploadImageStatus ?<Text style={{fontSize:15,fontWeight:'bold',color:'green'}} >uploaded</Text> :<Text style={{fontSize:15,fontWeight:'bold',color:'red'}}>Upload Image</Text> }
+               
+             </View>
+               <View style={{width:'20%'}} >
+                 <TouchableOpacity onPress={()=>{bs.current.snapTo(0)}} >
+               <Icon
+                    name="camera"
+                    size={35}
+                    color="blue" />
+                    </TouchableOpacity>
+               </View>
             </View>
-          </TouchableOpacity>
+            <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setDescription(data) }} />
+            <TouchableOpacity onPress={() => { addData() }} >
+              <View style={{ backgroundColor: '#367dd5', height: 50, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} >
+                <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#fff' }} >Add</Text>
+              </View>
+            </TouchableOpacity>
     
+
+
+            {/* <TouchableOpacity onPress={() => { bs.current.snapTo(0) }} >
+              <View style={{ backgroundColor: '#367dd5' , height: '10%',  borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} >
+                <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#fff' }} >upload Image</Text>
+              </View>
+            </TouchableOpacity> */}
+
+          </ScrollView>
+
         </View>
+        <BottomSheet
+        ref={bs}
+        snapPoints={[330, 0]}
+        renderContent={renderInner}
+        renderHeader={renderHeader}
+        initialSnap={1}
+        callbackNode={fall}
+        enabledGestureInteraction={true}
+      />
+
       </Modal>
 
 
 
     </View>
+
 
   );
 };
@@ -537,5 +364,81 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10
-  }
+  },
+  commandButton: {
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#FF6347',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  panel: {
+    padding: 20,
+    backgroundColor: 'gray',
+    paddingTop: 20,
+
+  },
+  header: {
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#333333',
+    shadowOffset: { width: -1, height: -3 },
+    shadowRadius: 2,
+    shadowOpacity: 0.4,
+    paddingTop: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  panelHeader: {
+    alignItems: 'center',
+  },
+  panelHandle: {
+    width: 40,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#00000040',
+    marginBottom: 10,
+  },
+  panelTitle: {
+    fontSize: 27,
+    height: 35,
+  },
+  panelSubtitle: {
+    fontSize: 14,
+    color: 'gray',
+    height: 30,
+    marginBottom: 10,
+  },
+  panelButton: {
+    padding: 13,
+    borderRadius: 10,
+    backgroundColor: '#FF6347',
+    alignItems: 'center',
+    marginVertical: 7,
+  },
+  panelButtonTitle: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  action: {
+    flexDirection: 'row',
+    marginTop: 10,
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f2f2f2',
+    paddingBottom: 5,
+  },
+  actionError: {
+    flexDirection: 'row',
+    marginTop: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FF0000',
+    paddingBottom: 5,
+  },
+  textInput: {
+    flex: 1,
+    marginTop: Platform.OS === 'ios' ? 0 : -12,
+    paddingLeft: 10,
+    color: '#05375a',
+  },
 });

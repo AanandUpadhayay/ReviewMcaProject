@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,22 +7,27 @@ import {
   TextInput,
   StyleSheet,
 } from 'react-native';
-
-import {useTheme} from 'react-native-paper';
-
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Feather from 'react-native-vector-icons/Feather';
-
+import auth from '@react-native-firebase/auth';
+import { useTheme } from 'react-native-paper';
 import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
 
 import ImagePicker from 'react-native-image-crop-picker';
+import storage from '@react-native-firebase/storage';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Feather from 'react-native-vector-icons/Feather';
 
-const EditProfileScreen = () => {
+
+// import { utils } from '@react-native-firebase/app';
+
+const ExploreScreen = () => {
+
+  const uid = auth().currentUser.uid;
 
   const [image, setImage] = useState();
-  const {colors} = useTheme();
+  const { colors } = useTheme();
+  console.log("image:" + image);
 
   // const takePhotoFromCamera = () => {
   //   ImagePicker.openCamera({
@@ -46,28 +51,44 @@ const EditProfileScreen = () => {
     }).then(image => {
       console.log(image);
       setImage(image.path);
-      this.bs.current.snapTo(1);
+      bs.current.snapTo(1);
+    });
+  }
+  const uploadImage = async () => {
+    const url = await storage().ref(`users/images/${uid}/`).getDownloadURL();
+    console.log(url);
+    const reference = storage().ref(`users/images/${uid}/image/1`);
+    const task = reference.putFile(image);
+    task.on('state_changed', taskSnapshot => {
+      console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
+    });
+
+    task.then(() => {
+      console.log('Image uploaded to the bucket!');
     });
   }
 
-  renderInner = () => (
+  const renderInner = () => (
     <View style={styles.panel}>
-      <View style={{alignItems: 'center'}}>
+      <View style={{ alignItems: 'center' }}>
         <Text style={styles.panelTitle}>Upload Photo</Text>
         <Text style={styles.panelSubtitle}>Choose Your Profile Picture</Text>
       </View>
       <TouchableOpacity style={styles.panelButton} onPress={choosePhotoFromLibrary}>
         <Text style={styles.panelButtonTitle}>Choose From Library</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.panelButton} onPress={uploadImage}>
+        <Text style={styles.panelButtonTitle}>Upload Image</Text>
+      </TouchableOpacity>
       <TouchableOpacity
         style={styles.panelButton}
-        onPress={() => this.bs.current.snapTo(1)}>
+        onPress={() => bs.current.snapTo(1)}>
         <Text style={styles.panelButtonTitle}>Cancel</Text>
       </TouchableOpacity>
     </View>
   );
 
-  renderHeader = () => (
+  const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.panelHeader}>
         <View style={styles.panelHandle} />
@@ -75,25 +96,26 @@ const EditProfileScreen = () => {
     </View>
   );
 
-  bs = React.createRef();
-  fall = new Animated.Value(1);
+  let bs = React.createRef();
+  let fall = new Animated.Value(1);
 
   return (
     <View style={styles.container}>
       <BottomSheet
-        ref={this.bs}
+        ref={bs}
         snapPoints={[330, 0]}
-        renderContent={this.renderInner}
-        renderHeader={this.renderHeader}
+        renderContent={renderInner}
+        renderHeader={renderHeader}
         initialSnap={1}
-        callbackNode={this.fall}
+        callbackNode={fall}
         enabledGestureInteraction={true}
       />
-      <Animated.View style={{margin: 20,
-        opacity: Animated.add(0.1, Animated.multiply(this.fall, 1.0)),
-    }}>
-        <View style={{alignItems: 'center'}}>
-          <TouchableOpacity onPress={() => this.bs.current.snapTo(0)}>
+      <Animated.View style={{
+        margin: 20,
+        opacity: Animated.add(0.1, Animated.multiply(fall, 1.0)),
+      }}>
+        <View style={{ alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => bs.current.snapTo(0)}>
             <View
               style={{
                 height: 100,
@@ -106,8 +128,8 @@ const EditProfileScreen = () => {
                 source={{
                   uri: image,
                 }}
-                style={{height: 100, width: 100}}
-                imageStyle={{borderRadius: 15}}>
+                style={{ height: 100, width: 100 }}
+                imageStyle={{ borderRadius: 15 }}>
                 <View
                   style={{
                     flex: 1,
@@ -117,7 +139,7 @@ const EditProfileScreen = () => {
                   <Icon
                     name="camera"
                     size={35}
-                    color="#fff"
+                    color="blue"
                     style={{
                       opacity: 0.7,
                       alignItems: 'center',
@@ -133,13 +155,13 @@ const EditProfileScreen = () => {
           </TouchableOpacity>
         </View>
 
-        
+
       </Animated.View>
     </View>
   );
 };
 
-export default EditProfileScreen;
+export default ExploreScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -156,12 +178,12 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#FFFFFF',
     paddingTop: 20,
-    
+
   },
   header: {
     backgroundColor: '#FFFFFF',
     shadowColor: '#333333',
-    shadowOffset: {width: -1, height: -3},
+    shadowOffset: { width: -1, height: -3 },
     shadowRadius: 2,
     shadowOpacity: 0.4,
     paddingTop: 20,
