@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, TextInput, StyleSheet, ScrollView, Modal, TouchableOpacity, FlatList, ImageBackground, } from 'react-native';
+import {Linking, Image, View, Text, Button, TextInput, StyleSheet, ScrollView, Modal, TouchableOpacity, FlatList, ImageBackground, } from 'react-native';
 import database from '@react-native-firebase/database';
 import DropDownPicker from 'react-native-dropdown-picker';
 import UploadScreen from './uploadImageScreen';
@@ -12,15 +12,19 @@ import Animated from 'react-native-reanimated';
 import ImagePicker from 'react-native-image-crop-picker';
 
 const SettingsScreen = () => {
+
   const reference = storage().ref('black-t-shirt-sm.png');
   const [image, setImage] = useState();
-  const [uploadImageStatus,setUploadImageStatus] = useState(false);
-  console.log(image);
+  const [uploadImageStatus, setUploadImageStatus] = useState(false);
+
   const uid = auth().currentUser.uid;
+
   const [data1, setData1] = useState([]);
   const [businessData, setBusinessData] = useState([]);
-  const [businessId, setBusinessId] = useState('');
+  const [businessId, setBusinessId] = useState(Math.floor((Math.random() * 1000000) + 1));
+  console.log(businessId);
   const [data, setData] = useState([]);
+
   const [modal, setModal] = useState(false);
   const [name, setName] = useState();
   const [businessName, setBusinessName] = useState('');
@@ -29,6 +33,9 @@ const SettingsScreen = () => {
   const [descripton, setDescription] = useState('');
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
+  // console.log(value);
+  const [category1, setCategory1] = useState('');
   const [category, setCategory] = useState([
     { label: 'Electrician', value: 'Electrician' },
     { label: 'Mechanic', value: 'Mechanic' },
@@ -41,23 +48,42 @@ const SettingsScreen = () => {
   ]);
   let bs = React.createRef();
   let fall = new Animated.Value(1);
+  console.log(data);
+  const userData = async () => {
 
-  console.log(JSON.stringify(businessData));
+    database()
+      .ref(`users/${uid}`)
+      .on('value', snapshot => {
+        let data2 = snapshot.val();
+        if (data2 != null) {
+          var keys = Object.keys(data2);
+          let testing = [];
+          for (let i = 0; i < keys.length; i++) {
+            let key = keys[i];
+            let obj = data2[key];
+            testing.push(obj);
+          }
+          setData(testing);
+        }
 
-  database()
-  .ref('/users/')
-  .set({
-    name: "name",
-   
-  })
-  .then(() => console.log('Data set.'));
 
-  const getId = () => {
-
-    var id = "master" + Math.round(new Date().getTime() / 1000);
-    setBusinessId(id);
+      });
 
   }
+
+  useEffect(() => {
+    userData();
+  }, []);
+
+
+
+  // const getId = () => {
+
+  //   var id = "master" + Math.round(new Date().getTime() / 1000);
+  //   console.log(id);
+  //   setBusinessId(id);
+
+  // }
 
 
   const choosePhotoFromLibrary = () => {
@@ -73,8 +99,9 @@ const SettingsScreen = () => {
   }
 
   const uploadImage = async () => {
-    const url = await storage().ref(`users/images/${uid}/`).getDownloadURL();
-    console.log(url);
+
+    const url = await storage().ref(`users/images/${uid}/image/1`).getDownloadURL();
+    setImageUrl(url);
     const reference = storage().ref(`users/images/${uid}/image/1`);
     const task = reference.putFile(image);
     task.on('state_changed', taskSnapshot => {
@@ -98,7 +125,7 @@ const SettingsScreen = () => {
       </TouchableOpacity>
       <TouchableOpacity style={styles.panelButton} onPress={uploadImage}>
         <Text style={styles.panelButtonTitle}>Upload Image</Text>
-        
+
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.panelButton}
@@ -117,86 +144,9 @@ const SettingsScreen = () => {
   );
 
 
-  useEffect(() => {
-    // setBusinessData([]);
-    database()
-      .ref('/users/' + uid)
-      .on('value', snapshot => {
-        //  setBusinessData(snapshot.val());
-        setData(snapshot.val());
-        upDateData();
-      });
 
-  }, [])
+  async function addData() {
 
-  // const choosePhotoFromLibrary = () => {
-  //   ImagePicker.openPicker({
-  //     width: 300,
-  //     height: 300,
-  //     cropping: true,
-  //     compressImageQuality: 0.7
-  //   }).then(image => {
-  //     console.log(image);
-  //     setImage(image.path);
-  //     bs.current.snapTo(1);
-  //   });
-  // }
-  // const uploadImage = async () => {
-  //   const url = await storage().ref(`users/images/${uid}/`).getDownloadURL();
-  //   console.log(url);
-  //   const reference = storage().ref(`users/images/${uid}/image/1`);
-  //   const task = reference.putFile(image);
-  //   task.on('state_changed', taskSnapshot => {
-  //     console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
-  //   });
-
-  //   task.then(() => {
-  //     console.log('Image uploaded to the bucket!');
-  //   });
-  // }
-
-
-  
-
-  console.log(JSON.stringify(businessData));
-
-  function upDateData() {
-
-    // setBusinessData([]);
-    var keys = Object.keys(data);
-
-
-
-    for (let i = 0; i < keys.length; i++) {
-
-      var key = keys[i];
-      businessData.push({
-        name: data[key].name,
-        businessName: data[key].businessName,
-        category: data[key].category,
-        descripton: data[key].descripton,
-        mobileNumber: data[key].mobileNumber,
-        businessId: data[key].businessId
-      })
-
-
-
-
-    }
-
-    const resultArr = businessData.filter((data, index) => {
-      return businessData.indexOf(data) === index;
-    })
-    console.log(JSON.stringify("result:" + resultArr))
-    setData1(resultArr);
-
-
-  }
-
-
-  function addData() {
-
-    getId();
     database()
       .ref('/users/' + uid + '/' + businessId)
       .set({
@@ -206,20 +156,54 @@ const SettingsScreen = () => {
         mobileNumber: mobileNumber,
         descripton: descripton,
         businessId: businessId,
-        image:image
+        image: imageUrl
       })
-      .then(() => console.log('Data set.'));
+      .then(() => {
+        
+      });
   }
-  console.log(JSON.stringify(data1));
 
   const renderItem = ({ item }) => {
 
     return (
-      <View>
-        <Text>
-          {item.mobileNumber}
-        </Text>
+      <TouchableOpacity onPress={()=>{Linking.openURL('tel:'+item.mobileNumber);}} >
+      <View style={{ height: 400, width: '90%', padding: 0, backgroundColor: '#f2f2f2', marginTop: 20, marginLeft: 15, borderRadius:10 }}  >
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-start', height: '10%', }} >
+
+          <View>
+            <Text style={{ fontSize: 20, fontWeight: 'bold' }} >
+              {item.category}
+            </Text>
+          </View>
+          <View style={{ marginLeft: 60 }} >
+            <Text style={{ fontSize: 20 }} >
+              ID   :   {item.businessId}
+            </Text>
+          </View>
+
+        </View>
+        <View style={{ justifyContent: 'flex-start', height: '10%', }} >
+          <Text style={{ fontSize: 20 }} >
+            {item.businessName}
+          </Text>
+        </View>
+        <View style={{ justifyContent: 'flex-start', height: '80%', }} >
+          {/* <Text style={{ fontSize: 20 }} >
+            {item.businessName}
+          </Text> */}
+          <Image source={{
+            uri: item.image //'https://firebasestorage.googleapis.com/v0/b/online-home-maintenance.appspot.com/o/users%2Fimages%2FgZ2Qk4wyrSbjesHFrF5owlToWL62%2Fimage%2F1?alt=media&token=66f21226-b039-4346-8952-394dfc3fc4d6',
+          }}
+            style={{ height: '100%', width: '100%' }}
+          />
+
+
+
+
+        </View>
+
       </View>
+      </TouchableOpacity>
     );
   };
 
@@ -230,7 +214,7 @@ const SettingsScreen = () => {
       <View style={{ height: '90%', }} >
         <View style={{}}>
           <FlatList
-            data={data1}
+            data={data}
             renderItem={renderItem}
             keyExtractor={item => item.businessId}
           />
@@ -238,7 +222,11 @@ const SettingsScreen = () => {
         </View>
       </View>
       <View style={{ height: '10%', justifyContent: 'flex-end', alignItems: 'flex-end' }} >
-        <TouchableOpacity onPress={() => { setModal(!modal) }} >
+        <TouchableOpacity onPress={() => {
+          setModal(!modal);
+
+          setBusinessId(Math.floor((Math.random() * 1000000) + 1));
+        }} >
           <Icon name="plus" size={50}
             color="blue" />
         </TouchableOpacity>
@@ -276,41 +264,41 @@ const SettingsScreen = () => {
               items={category}
               setOpen={setOpen}
               setValue={setValue}
-              setItems={setCategory}
+              setItems={setCategory1}
             />
             <Text style={styles.inputLabel} >Enter Name</Text>
             <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setName(data) }} />
             <Text style={styles.inputLabel} >Enter Business Name</Text>
             <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setBusinessName(data) }} />
-            <Text style={styles.inputLabel} >Enter Business Name</Text>
-            <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setBusinessName(data) }} />
+            {/* <Text style={styles.inputLabel} >Enter Business Name</Text>
+            <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setBusinessName(data) }} /> */}
 
 
             <Text style={styles.inputLabel} >Mobile Number</Text>
             <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setMobileNumber(data) }} />
             <Text style={styles.inputLabel} >Description</Text>
             <View style={{ flexDirection: 'row' }} >
-             <View style={{width:'80%'}} >
-               <Text>Upload Image</Text>
-               {uploadImageStatus ?<Text style={{fontSize:15,fontWeight:'bold',color:'green'}} >uploaded</Text> :<Text style={{fontSize:15,fontWeight:'bold',color:'red'}}>Upload Image</Text> }
-               
-             </View>
-               <View style={{width:'20%'}} >
-                 <TouchableOpacity onPress={()=>{bs.current.snapTo(0)}} >
-               <Icon
+              <View style={{ width: '80%' }} >
+                <Text>Upload Image</Text>
+                {uploadImageStatus ? <Text style={{ fontSize: 15, fontWeight: 'bold', color: 'green' }} >uploaded</Text> : <Text style={{ fontSize: 15, fontWeight: 'bold', color: 'red' }}>Upload Image</Text>}
+
+              </View>
+              <View style={{ width: '20%' }} >
+                <TouchableOpacity onPress={() => { bs.current.snapTo(0) }} >
+                  <Icon
                     name="camera"
                     size={35}
                     color="blue" />
-                    </TouchableOpacity>
-               </View>
+                </TouchableOpacity>
+              </View>
             </View>
-            <TextInput placeholder="Enter Name" style={styles.inputBox} onChangeText={(data) => { setDescription(data) }} />
+            <TextInput placeholder="Enter Description" style={styles.inputBox} onChangeText={(data) => { setDescription(data) }} />
             <TouchableOpacity onPress={() => { addData() }} >
               <View style={{ backgroundColor: '#367dd5', height: 50, borderRadius: 5, justifyContent: 'center', alignItems: 'center' }} >
                 <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#fff' }} >Add</Text>
               </View>
             </TouchableOpacity>
-    
+
 
 
             {/* <TouchableOpacity onPress={() => { bs.current.snapTo(0) }} >
@@ -323,14 +311,14 @@ const SettingsScreen = () => {
 
         </View>
         <BottomSheet
-        ref={bs}
-        snapPoints={[330, 0]}
-        renderContent={renderInner}
-        renderHeader={renderHeader}
-        initialSnap={1}
-        callbackNode={fall}
-        enabledGestureInteraction={true}
-      />
+          ref={bs}
+          snapPoints={[330, 0]}
+          renderContent={renderInner}
+          renderHeader={renderHeader}
+          initialSnap={1}
+          callbackNode={fall}
+          enabledGestureInteraction={true}
+        />
 
       </Modal>
 

@@ -99,7 +99,8 @@ const SignInScreen = ({navigation}) => {
     }
 
     async function signInWithPhoneNumber(phoneNumber) {
-        const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+        let num = '+91'+phoneNumber;
+        const confirmation = await auth().signInWithPhoneNumber(num);
      setToken(confirmation._verificationId);
         setConfirm(confirmation);
       }
